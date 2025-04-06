@@ -1,35 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bridge Home</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f2f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #1a73e8;
-            text-align: center;
-        }
+        body { font-family: sans-serif; margin: 20px; }
+        .user-info { margin-bottom: 15px; }
+        .auth-links a { margin-right: 10px; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to Bridge</h1>
-        <p>This is your first web application. You can start customizing it to build your own project.</p>
+
+    {# Display flashed messages (e.g., welcome message after login) #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div>
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h1>Welcome to Bridge!</h1>
+
+    <div class="user-info">
+        {% if user %}
+            <p>Hello, {{ user.username }}!</p>
+        {% else %}
+            <p>You are not logged in.</p>
+        {% endif %}
     </div>
+
+    <div class="auth-links">
+        {% if user %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+            {# Add links to other protected pages here #}
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </div>
+
+    {# Add main content of your application here #}
+
 </body>
 </html> 

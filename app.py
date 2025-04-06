@@ -1,7 +1,8 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+# Import session and check_password_hash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy # Import SQLAlchemy
-from werkzeug.security import generate_password_hash # Import password hashing
+from werkzeug.security import generate_password_hash, check_password_hash # Import password hashing and check_password_hash
 
 app = Flask(__name__)
 
@@ -31,9 +32,15 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+# Updated Home Route
 @app.route('/')
 def home():
-    return render_template('index.html')
+    user_id = session.get('user_id')
+    user = None
+    if user_id:
+        user = User.query.get(user_id)
+    # Pass user info (or None) to the template
+    return render_template('index.html', user=user)
 
 # Registration Route
 @app.route('/register', methods=['GET', 'POST'])
@@ -67,12 +74,41 @@ def register():
     # GET request: display the registration form
     return render_template('register.html')
 
-# Placeholder Login Route (we'll implement this later)
-@app.route('/login')
+# Login Route Implementation
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    # For now, just render a simple message or template
-    # You might want to create a login.html template later
-    return "Login Page Placeholder - Registration Successful!"
+    # Clear any existing user_id - prevents logged-in users seeing login page directly
+    # session.pop('user_id', None)
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if not username or not password:
+            flash('Please enter both username and password.', 'warning')
+            return redirect(url_for('login'))
+
+        user = User.query.filter_by(username=username).first()
+
+        # Check if user exists and password hash matches
+        if user and check_password_hash(user.password_hash, password):
+            # Store user ID in session
+            session['user_id'] = user.id
+            flash(f'Welcome back, {user.username}!', 'success')
+            return redirect(url_for('home')) # Redirect to home page after login
+        else:
+            flash('Invalid username or password. Please try again.', 'danger')
+            return redirect(url_for('login'))
+
+    # GET request: display the login form
+    return render_template('login.html')
+
+# Logout Route
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None) # Remove user_id from session
+    flash('You have been successfully logged out.', 'info')
+    return redirect(url_for('login')) # Redirect to login page after logout
 
 if __name__ == '__main__':
     # Keep host and port consistent with previous setup
