@@ -50,10 +50,16 @@ with app.app_context():
 def home():
     user_id = session.get('user_id')
     user = None
+    posts = []
+    
+    # Get all posts for the home page, newest first
+    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    
     if user_id:
         user = User.query.get(user_id)
-    # Pass user info (or None) to the template
-    return render_template('index.html', user=user)
+    
+    # Pass user info and posts to the template
+    return render_template('index.html', user=user, posts=posts)
 
 # Registration Route
 @app.route('/register', methods=['GET', 'POST'])
@@ -122,6 +128,30 @@ def logout():
     session.pop('user_id', None) # Remove user_id from session
     flash('You have been successfully logged out.', 'info')
     return redirect(url_for('login')) # Redirect to login page after logout
+
+# New route for creating posts
+@app.route('/create_post', methods=['POST'])
+def create_post():
+    # Check if user is logged in
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('You must be logged in to create a post.', 'warning')
+        return redirect(url_for('login'))
+    
+    # Get the post content from the form
+    body = request.form.get('body')
+    
+    if not body:
+        flash('Post cannot be empty.', 'warning')
+        return redirect(url_for('home'))
+    
+    # Create new post
+    new_post = Post(body=body, user_id=user_id)
+    db.session.add(new_post)
+    db.session.commit()
+    
+    flash('Your post was created successfully!', 'success')
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     # Keep host and port consistent with previous setup

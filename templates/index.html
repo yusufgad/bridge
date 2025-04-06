@@ -10,6 +10,59 @@
         .auth-links a { margin-right: 10px; }
         .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
         .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .alert-info { color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb; }
+        .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        
+        /* Post creation form and posts styling */
+        .post-form {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .post-form textarea {
+            width: 100%;
+            height: 80px;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .post-form button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .post-form button:hover {
+            background-color: #0056b3;
+        }
+        .posts {
+            margin-top: 30px;
+        }
+        .post {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .post-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .post-time {
+            color: #6c757d;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+        .post-body {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
@@ -38,14 +91,36 @@
     <div class="auth-links">
         {% if user %}
             <a href="{{ url_for('logout') }}">Logout</a>
-            {# Add links to other protected pages here #}
         {% else %}
             <a href="{{ url_for('login') }}">Login</a>
             <a href="{{ url_for('register') }}">Register</a>
         {% endif %}
     </div>
 
-    {# Add main content of your application here #}
+    {% if user %}
+        <div class="post-form">
+            <h2>Create a Post</h2>
+            <form action="{{ url_for('create_post') }}" method="post">
+                <textarea name="body" placeholder="What's on your mind?" required></textarea>
+                <button type="submit">Post</button>
+            </form>
+        </div>
+    {% endif %}
+
+    <div class="posts">
+        <h2>Recent Posts</h2>
+        {% if posts %}
+            {% for post in posts %}
+                <div class="post">
+                    <div class="post-author">{{ post.author.username }}</div>
+                    <div class="post-time">{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+                    <div class="post-body">{{ post.body }}</div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No posts yet. Be the first to post something!</p>
+        {% endif %}
+    </div>
 
 </body>
 </html> 
