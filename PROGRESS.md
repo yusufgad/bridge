@@ -9,11 +9,11 @@ This file tracks the development progress and planned tasks.
 - [x] Task 1.3: User Registration Route and Template
 - [x] Task 1.4: User Login, Logout, and Session Handling
 
-## Milestone 2: Core Features (Pending)
+## Milestone 2: Core Features (In Progress)
 
-- [ ] Task 2.1: Define Post/Message Model
-- [ ] Task 2.2: Implement functionality to create new posts
-- [ ] Task 2.3: Display posts on the home page or a dedicated feed
+- [x] Task 2.1: Define Post/Message Model
+- [x] Task 2.2: Implement functionality to create new posts
+- [x] Task 2.3: Display posts on the home page or a dedicated feed
 - [ ] Task 2.4: User Profile Pages (Optional)
 
 ## Potential Future Tasks / Improvements (Pending)
