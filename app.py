@@ -3,6 +3,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy # Import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash # Import password hashing and check_password_hash
+from datetime import datetime, timezone # Import datetime
 
 app = Flask(__name__)
 
@@ -23,9 +24,21 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     # Increased length for password hash
     password_hash = db.Column(db.String(256), nullable=False)
+    # Define the relationship to the Post model
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+# Post Model (New)
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.String(280), nullable=False) # e.g., Max 280 characters
+    timestamp = db.Column(db.DateTime, index=True, default=lambda: datetime.now(timezone.utc))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Post {self.body[:30]}...>'
 
 # Create database tables if they don't exist
 # This should ideally be handled with migrations (e.g., Flask-Migrate) in a larger app
